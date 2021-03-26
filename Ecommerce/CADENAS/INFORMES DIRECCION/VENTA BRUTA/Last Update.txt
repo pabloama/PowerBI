@@ -1,0 +1,6 @@
+// Last Update
+let
+    Source = #table(type table[Date Last Refreshed=datetime], {{DateTime.LocalNow()}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Source,{{"Date Last Refreshed", "Date Last Refreshed"}})
+in
+    #"Columnas con nombre cambiado"

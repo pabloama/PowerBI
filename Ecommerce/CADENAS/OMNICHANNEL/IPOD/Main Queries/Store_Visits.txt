@@ -1,0 +1,11 @@
+// Bershka_Store_Visits
+let
+    Source = Table.Combine({Bershka_Store_Visits_FY2020, Bershka_Store_Visits_FY2021}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"ID_FECHA", type date}, {"LOCALIZACION", type text}, {"PAIS", type text}}),
+    #"Add Column" = Table.AddColumn(#"Changed Type", "ID Store", each Text.PadStart([LOCALIZACION], 5, "0"), type text),
+    #"Add Column2" = Table.AddColumn(#"Add Column", "Store Description", each Text.PadStart(Text.BeforeDelimiter([PHYSICAL_STORE], " -"), 5, "0") & " - " & Text.AfterDelimiter([PHYSICAL_STORE], "- ")),
+    #"Inserted Merged Column" = Table.AddColumn(#"Add Column2", "ID Market-Store", each Text.Combine({[PAIS], [ID Store]}, "-"), type text),
+    #"Removed Columns" = Table.RemoveColumns(#"Inserted Merged Column",{"ESTADO_COMUNICACION", "PAIS_ISO", "LOCALIZACION", "PHYSICAL_STORE"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"ID_FECHA", "Date"}, {"PAIS", "ID Market"}, {"MARKET", "Market"}, {"MARKET_ENGLISH", "Market English"}, {"ID_LOCALIZACION", "Market ID"}, {"TOTAL_NUMERO_ENTRADAS", "Store Visits IN"}, {"TOTAL_NUMERO_SALIDAS", "Store Visits OUT"}})
+in
+    #"Renamed Columns"

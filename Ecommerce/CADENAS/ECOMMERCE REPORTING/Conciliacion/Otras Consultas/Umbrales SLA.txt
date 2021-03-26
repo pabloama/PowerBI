@@ -1,0 +1,6 @@
+// Umbrales SLA
+let
+    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("rZJNTsMwEIWvYmVdFk3FAUpIUERJQwsIqepiFLutpTAGp6kQN2LBiiPkYvhnJJCosCux+JzM5D0/K+PVKhkno6TWUmm5B/NgD/KgTCvTArh9ubGUhVnHbKc0JOtRpKlyrgnjwwd0UbaCCCflyKB9gmZ4R1NdEefhrPz1WXDp0pZERNq3aWGp5853WpxzVmQNRpZ4EOg7JXb9RjbS1MJ8mRFpOL3Q0HPrmRIRnotWvfR2Hp09PhHhqwVyd0TGBcsUbqQ285HDJ9pGDVsnunULXSe7539t+fuypaauFPt7KJdEeqrxnvhpnHjjcja1/24hmh28+Yt9R5wd0eW412LrdddESDcnjukywEa0XvdIhHQVYXTrLw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Orden = _t, #"Prioridad Revisión" = _t, #"Estado Pedido Mapeado" = _t, #"Estado Pedido" = _t, #"Estado Pedido Operativa" = _t, SLA = _t]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Estado Pedido Mapeado", type text}, {"Estado Pedido", type text}, {"Estado Pedido Operativa", type text}, {"SLA", type text}, {"Orden", Int64.Type}})
+in
+    #"Tipo cambiado"

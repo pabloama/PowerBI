@@ -1,0 +1,7 @@
+// Stock_Insuficiente_Pedidos_Totales
+let
+    Source = Table.Combine({Stock_Insuficiente_Pedidos_Totales_1, Stock_Insuficiente_Pedidos_Totales_2, Stock_Insuficiente_Pedidos_Totales_3, Stock_Insuficiente_Pedidos_Totales_4}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"FECHA_PEDIDO", type date}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"NUM_PEDIDOS", "Número Pedidos"}, {"FECHA_PEDIDO", "Fecha Pedido"}, {"TIENDA_VIRTUAL", "Tienda Online"}})
+in
+    #"Renamed Columns"

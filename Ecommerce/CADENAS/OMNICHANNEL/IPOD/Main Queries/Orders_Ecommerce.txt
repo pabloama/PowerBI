@@ -1,0 +1,8 @@
+// Bershka_Orders_Ecommerce
+let
+    Source = Table.Combine({Bershka_Orders_Ecommerce_FY2020, Bershka_Orders_Ecommerce_FY2021}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"ID_FECHA", type date}, {"PEDIDOS", Int64.Type}, {"UNIDADES", Int64.Type}, {"LOCAL_AMOUNT", type number}, {"ID_CADENA", Int64.Type}, {"PAIS", Int64.Type}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"ID_FECHA", "Date"}, {"PEDIDOS", "Orders"}, {"UNIDADES", "Units"}, {"LOCAL_AMOUNT", "Local Amount"}, {"AMOUNT_EUROS", "Amount (€)"}, {"ID_CADENA", "Cadena"}, {"PAIS", "ID Market"}, {"MARKET", "Market"}, {"MARKET_ENGLISH", "Market English"}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Date", "Cadena", "ID Market", "Market English", "Market", "Orders", "Units", "Local Amount", "Amount (€)"})
+in
+    #"Reordered Columns"

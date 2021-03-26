@@ -1,0 +1,10 @@
+// Localizacion
+let
+    Source = Oracle.Database("EXAPRO_REP", [HierarchicalNavigation=true, Query="-- ORACLE EXADATA - DW ECOMMERCE - CRONOS - BERSHKA#(lf)SELECT DISTINCT#(lf)#(tab)dl.LOCALIZACION,#(lf)#(tab)dl.DESCRIPCION physical_store#(lf)FROM DMCOMERCIAL.DIM_LOCALIZACION dl#(lf)WHERE#(lf)  dl.ID_CADENA = 5 -- BERSHKA#(lf)ORDER BY #(lf)#(tab)dl.LOCALIZACION ASC", CommandTimeout=#duration(0, 4, 0, 0)]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"LOCALIZACION", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "Descripción Tienda Destino", each Text.PadStart(Text.BeforeDelimiter([PHYSICAL_STORE], " -"), 5, "0") & " - " & Text.AfterDelimiter([PHYSICAL_STORE], "- ")),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Descripción Tienda Destino", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"PHYSICAL_STORE"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"LOCALIZACION", "Localización"}, {"Descripción Tienda Destino", "Descripción"}})
+in
+    #"Renamed Columns"

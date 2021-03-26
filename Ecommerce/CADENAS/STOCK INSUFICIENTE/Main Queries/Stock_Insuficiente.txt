@@ -1,0 +1,14 @@
+// Stock_Insuficiente
+let
+    Source = Table.NestedJoin(Stock_Insuficiente_INDOM, {"Key Pedido Partnumber"}, Stock_Insuficiente_GIPI, {"Key Pedido Partnumber"}, "Stock_Insuficiente_GIPI", JoinKind.LeftOuter),
+    #"Expanded Stock_Insuficiente_GIPI" = Table.ExpandTableColumn(Source, "Stock_Insuficiente_GIPI", {"Comentario"}, {"Comentario"}),
+    #"Added Conditional Column" = Table.AddColumn(#"Expanded Stock_Insuficiente_GIPI", "Comentario GIPI", each if [Resolución] = "INDOM" then null else [Comentario]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Added Conditional Column",{{"Comentario GIPI", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Comentario"}),
+    #"Removed Duplicates" = Table.Distinct(#"Removed Columns"),
+    #"Inserted Date Subtraction" = Table.AddColumn(#"Removed Duplicates", "Subtraction", each Duration.Days([Fecha Hora Stock Insuficiente] - [Fecha Hora Pedido])),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Inserted Date Subtraction",{{"Subtraction", Int64.Type}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"Subtraction", "Tiempo Resolución"}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Key Pedido Partnumber", "Pedido", "Subpedido", "Partnumber", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Stock Insuficiente", "Hora Stock Insuficiente", "Estado Pedido", "Estado Línea Pedido", "Tienda Online", "Tipo Origen Stock", "Origen Stock", "Cantidad Solicitada", "Cantidad Separada", "Resolución", "Fecha Hora Stock Insuficiente - Texto", "Tiempo Resolución", "Comentario GIPI"})
+in
+    #"Reordered Columns"

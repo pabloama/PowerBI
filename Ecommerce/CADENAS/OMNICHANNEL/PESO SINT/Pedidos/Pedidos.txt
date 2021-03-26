@@ -1,0 +1,8 @@
+// Pedidos
+let
+    Source = Table.Combine({Pedidos_Cadenas_FY2019, Pedidos_Cadenas_FY2020, Pedidos_Cadenas_FY2021}),
+    #"Added Conditional Column" = Table.AddColumn(Source, "Cadena", each if [ID Cadena] = 1 then "ZARA" else if [ID Cadena] = 2 then "ZARA" else if [ID Cadena] = 3 then "PULL & BEAR" else if [ID Cadena] = 5 then "BERSHKA" else if [ID Cadena] = 6 then "STRADIVARIUS" else if [ID Cadena] = 7 then "OYSHO" else if [ID Cadena] = 11 then "MASSIMO DUTTI" else if [ID Cadena] = 14 then "ZARA HOME" else if [ID Cadena] = 16 then "UTERQÜE" else if [ID Cadena] = 8 then "LEFTIES" else "DESCONOCIDO"),
+    #"Changed Type" = Table.TransformColumnTypes(#"Added Conditional Column",{{"Cadena", type text}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type",{"Fecha Pedido", "Pedidos", "Unidades", "Importe (ML)", "Importe (€)", "ID Cadena", "Cadena", "Mercado"})
+in
+    #"Reordered Columns"

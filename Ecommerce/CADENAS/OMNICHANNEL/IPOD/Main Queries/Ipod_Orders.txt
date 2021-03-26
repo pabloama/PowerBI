@@ -1,0 +1,21 @@
+// Ipod_Orders
+let
+    Source = Table.Combine({Ipod_Orders_FY2021, Ipod_Orders_FY2020}),
+    #"Replaced Value" = Table.ReplaceValue(Source,null,"Sin información",Replacer.ReplaceValue,{"Country ISO"}),
+    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",null,"Sin información",Replacer.ReplaceValue,{"City"}),
+    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1",null,"Sin información",Replacer.ReplaceValue,{"Street"}),
+    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2",",","",Replacer.ReplaceText,{"Market"}),
+    #"Added Custom" = Table.AddColumn(#"Replaced Value3", "MoCaCo", each Text.PadStart([Modelo], 4, "0") & Text.PadStart([Calidad], 3, "0") & Text.PadStart([Color], 3, "0")),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Store", each Text.PadStart(Text.BeforeDelimiter([Physical Store], " -"), 5, "0") & " - " & Text.AfterDelimiter([Physical Store], "- ")),
+    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom1",{{"MoCaCo", type text}, {"Store", type text}}),
+    #"Added Custom2" = Table.AddColumn(#"Changed Type", "Market - Store", each [Market] & " - " & [Store]),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom2",{{"Market - Store", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"Modelo", "Calidad", "Color", "Physical Store"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"Date", "Hour", "Minute", "Ecommerce Order ID", "MoCaCo", "Units", "Local Amount", "Amount (€)", "Ecommerce Payment Type", "Ipod Payment Type", "Chain ID", "Section ID", "Ecommerce Order Status", "Market", "Store", "Market - Store", "Country ISO", "City", "Street", "Postal Code", "Longitude", "Latitude"}),
+    #"Merged Columns" = Table.CombineColumns(#"Reordered Columns",{"Ecommerce Payment Type", "Ipod Payment Type"},Combiner.CombineTextByDelimiter(" - ", QuoteStyle.None),"Ecommerce Payment Type - Ipod Payment Type"),
+    #"Merged Queries" = Table.NestedJoin(#"Merged Columns",{"Ecommerce Payment Type - Ipod Payment Type"},Equivalences_Payment_Type,{"Ecommerce Payment Type - Ipod Payment Type"},"Equivalences_Payment_Type",JoinKind.LeftOuter),
+    #"Expanded Equivalences_Payment_Type" = Table.ExpandTableColumn(#"Merged Queries", "Equivalences_Payment_Type", {"Payment Device", "Payment Type", "Payment Method"}, {"Payment Device", "Payment Type", "Payment Method"}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Expanded Equivalences_Payment_Type",{"Ecommerce Payment Type - Ipod Payment Type"}),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Removed Columns1",{"Date", "Hour", "Minute", "Ecommerce Order ID", "MoCaCo", "Units", "Local Amount", "Amount (€)", "Payment Type", "Payment Device", "Payment Method", "Chain ID", "Section ID", "Ecommerce Order Status", "Market", "Store", "Market - Store", "Country ISO", "City", "Street", "Postal Code", "Longitude", "Latitude"})
+in
+    #"Reordered Columns1"

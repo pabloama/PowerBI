@@ -1,0 +1,6 @@
+// DIM_PAIS
+let
+    Origen = Oracle.Database("axine1-scansrv.central.inditex.grp:11521/s_itxpro_mstrcorp", [HierarchicalNavigation=true, Query="SELECT ID_PAIS, DESCRIPCION FROM DMCOMERCIAL.DIM_PAIS"]),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"DESCRIPCION", "MERCADO"}})
+in
+    #"Columnas con nombre cambiado"

@@ -1,0 +1,27 @@
+// PowerBI_Visitas_Conv
+let
+    Origen = Excel.Workbook(File.Contents("\\axinfsusrv2\compartes\Compartes1\PBIstranaliticaweb\PowerBI_Visitas_Conv.xlsx"), null, true),
+    PowerBI_Visitas_Conv_Sheet = Origen{[Item="PowerBI_Visitas_Conv",Kind="Sheet"]}[Data],
+    #"Tipo cambiado1" = Table.TransformColumnTypes(PowerBI_Visitas_Conv_Sheet,{{"Column1", type text}, {"Column2", Int64.Type}, {"Column3", Int64.Type}, {"Column4", Int64.Type}, {"Column5", Int64.Type}, {"Column6", type date}, {"Column7", type text}, {"Column8", Int64.Type}, {"Column9", Int64.Type}, {"Column10", type number}, {"Column11", Int64.Type}, {"Column12", Int64.Type}, {"Column13", type number}, {"Column14", Int64.Type}, {"Column15", Int64.Type}}),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Tipo cambiado1",{{"Column1", type text}, {"Column2", Int64.Type}, {"Column3", Int64.Type}, {"Column4", Int64.Type}, {"Column5", Int64.Type}, {"Column6", type date}, {"Column7", type text}, {"Column8", Int64.Type}, {"Column9", Int64.Type}, {"Column10", type number}, {"Column11", Int64.Type}, {"Column12", Int64.Type}, {"Column13", type number}, {"Column14", Int64.Type}, {"Column15", Int64.Type}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Column1", "País"}, {"Column2", "COD_PAIS"}, {"Column3", "EJERCICIO"}, {"Column4", "SEMANA"}, {"Column5", "EJERCICIO FISCAL"}, {"Column6", "DIA"}, {"Column7", "DESC_DIA"}, {"Column8", "SIN IPOD"}, {"Column9", "Pedidos"}, {"Column10", "Venta Bruta €"}, {"Column11", "SIN IPOD A-1"}, {"Column12", "PEDIDOS A-1"}, {"Column13", "VENTA BRUTA € A-1"}, {"Column14", "Visitas"}, {"Column15", "VISITAS A-1"}})
+in
+    #"Columnas con nombre cambiado"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

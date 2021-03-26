@@ -1,0 +1,7 @@
+// Compras_Actuales_Usuarios_Viejos_Primera_Vez_Con_Mobile_Desktop
+let
+    Origen = Table.NestedJoin(Usuarios_Compra_Despues_1_Setp_2019, {"Email", "Mercado", "Cadena"}, Usuarios_Viejos_Primera_Vez_Con_Mobile_Desktop, {"Email", "Mercado", "Cadena"}, "Usuarios_Viejos_Primera_Vez_Con_Mobile_Desktop", JoinKind.Inner),
+    #"Se expandió Usuarios_Viejos_Primera_Vez_Con_Mobile_Desktop" = Table.ExpandTableColumn(Origen, "Usuarios_Viejos_Primera_Vez_Con_Mobile_Desktop", {"Cadena"}, {"Cadena.1"}),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Se expandió Usuarios_Viejos_Primera_Vez_Con_Mobile_Desktop",{"Cadena.1"})
+in
+    #"Columnas quitadas"

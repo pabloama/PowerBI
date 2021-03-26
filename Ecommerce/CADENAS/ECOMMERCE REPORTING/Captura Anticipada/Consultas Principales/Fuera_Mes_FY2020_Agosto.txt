@@ -1,0 +1,5 @@
+// Fuera_Mes_FY2020_Agosto
+let
+    Origen = Table.Combine({Uterque_Fuera_Mes_FY2020_Agosto_1, Uterque_Fuera_Mes_FY2020_Agosto_2, Uterque_Fuera_Mes_FY2020_Agosto_3})
+in
+    Origen

@@ -1,0 +1,15 @@
+// Market_Store
+let
+    Source = Oracle.Database("EXAPRO_REP", [HierarchicalNavigation=true, Query="-- ORACLE EXADATA - DW ECOMMERCE - IPOD - MARKET & STORE - BERSHKA#(lf)SELECT#(lf)  DISTINCT #(lf)    dp.DESCRIPCION_INGLES market_eng,#(lf)    dp.DESCRIPCION market,#(lf)    dll.DESCRIPCION physical_store,#(lf)    dll.LOCALIZACION#(lf)FROM#(lf)  DMCOMERCIAL.MIC_FACT_PEDIDO_DEVOL_ECOMM mf#(lf)INNER JOIN#(lf)  DMCOMERCIAL.DIM_PAIS dp#(lf)    ON (dp.ID_PAIS = mf.ID_PAIS)#(lf)INNER JOIN#(lf)  DMECOMMERCE.DIM_TIPO_DISPOSITIVO dtd#(lf)    ON (dtd.ID_TIPO_DISPOSITIVO = mf.ID_TIPO_DISPOSITIVO)#(lf)      AND dtd.ID_TIPO_DISPOSITIVO IN (23) -- IPOD TRANSACTION#(lf)INNER JOIN#(lf)  DMCOMERCIAL.DIM_LOCALIZACION dll#(lf)    ON (dll.ID_LOCALIZACION = mf.ID_LOCALIZACION_DISPOSITIVO)#(lf)WHERE#(lf)  mf.ID_FECHA_PLATAFORMA >= TO_DATE ('01/01/2020', 'DD/MM/YYYY')#(lf)    AND mf.ID_FECHA_PLATAFORMA < TO_DATE ('01/03/2022', 'DD/MM/YYYY')#(lf)      AND mf.ID_FECHA >= TO_DATE ('01/02/2020', 'DD/MM/YYYY') #(lf)        AND mf.ID_FECHA < TO_DATE ('01/02/2022', 'DD/MM/YYYY')#(lf)            AND mf.ID_CADENA = 5 -- BERSHKA #(lf)              AND mf.ID_TIPO_MOVIMIENTO IN (72, 772) -- ORDER TRANSACTION#(lf)                AND mf.ESTADO NOT IN ('X', 'N', 'PQ') -- DRIVE CADENAS#(lf)                  AND mf.REPOSICION = 0 -- DRIVE#(lf)                    AND mf.ID_SECCION > 0 -- DRIVE#(lf)                      AND mf.ID_PAIS > 0 -- DRIVE#(lf)                          AND dll.LOCALIZACION > 0 -- DRIVE#(lf)ORDER BY #(lf)  dll.LOCALIZACION ASC"]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"MARKET", type text}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Changed Type",",","",Replacer.ReplaceText,{"MARKET_ENG", "MARKET"}),
+    #"Added Custom" = Table.AddColumn(#"Valor reemplazado", "Store", each Text.PadStart(Text.BeforeDelimiter([PHYSICAL_STORE], " -"), 5, "0") & " - " & Text.AfterDelimiter([PHYSICAL_STORE], "- ")),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Store", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"PHYSICAL_STORE"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"MARKET", "Market"}, {"MARKET_ENG", "Market Description"}}),
+    #"Added Custom1" = Table.AddColumn(#"Renamed Columns", "Market - Store", each [Market] & " - " & [Store]),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom1",{{"Market - Store", type text}}),
+    #"Inserted Text Before Delimiter" = Table.AddColumn(#"Changed Type2", "Cod Store", each Text.BeforeDelimiter([Store], " "), type text),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Inserted Text Before Delimiter",{"LOCALIZACION"})
+in
+    #"Columnas quitadas"

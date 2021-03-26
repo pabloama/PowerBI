@@ -1,0 +1,5 @@
+// No_Facturados_FY2020_Agosto
+let
+    Source = Table.Combine({Uterque_No_Facturados_FY2020_Agosto_1, Uterque_No_Facturados_FY2020_Agosto_2, Uterque_No_Facturados_FY2020_Agosto_3})
+in
+    Source

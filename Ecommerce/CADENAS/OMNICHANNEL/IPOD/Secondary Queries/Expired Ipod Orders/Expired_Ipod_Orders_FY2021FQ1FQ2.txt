@@ -1,0 +1,5 @@
+// Expired_Ipod_Orders_FY2021FQ1FQ2
+let
+    Source = DB2.Database("ieecdb2v1:50000", "inditex", [HierarchicalNavigation=true, Implementation="IBM", Query="-- IBM DB2 - PEDIDOS IPOD - EXPIRED IPOD ORDERS - FY2019 FQ1&FQ2 - BERSHKA#(lf)SELECT#(lf)#(tab)DISTINCT o.ORDERS_ID expired_ipod_orders,#(lf)#(tab)#(tab)o.TIMEPLACED,#(lf)#(tab)#(tab)s.DIRECTORY marketplace,#(lf)#(tab)#(tab)xi.TIENDA_ORIGEN origen,#(lf)#(tab)#(tab)t.NOMBRE_TIENDA#(lf)FROM UECOITX_SP2.ORDERS o#(lf)INNER JOIN UECOITX_SP2.STORE s #(lf)#(tab)ON o.STOREENT_ID = s.STORE_ID#(lf)#(tab)#(tab)AND s.DIRECTORY LIKE 'Bershka%' #(lf)#(tab)#(tab)#(tab)AND s.DIRECTORY NOT LIKE '%AUX%' #(lf)#(tab)#(tab)#(tab)#(tab)AND s.DIRECTORY NOT LIKE '%AssetStore%'#(lf)INNER JOIN UECOITX_SP2.XORDERS_INFO xi#(lf)#(tab)ON xi.ORDERS_ID = o.ORDERS_ID#(lf)INNER JOIN MAESTROS.TIENDA t#(lf)#(tab)ON t.ID_TIENDA = xi.TIENDA_ORIGEN#(lf)WHERE #(lf)#(tab)o.STATUS = 'X'#(lf)#(tab)#(tab)AND o.FIELD3 = 'iPod store order expired'#(lf)#(tab)#(tab)#(tab)AND o.TIMEPLACED >= '2021-02-01'#(lf)#(tab)#(tab)#(tab)#(tab)AND o.TIMEPLACED <= '2021-07-31'#(lf)WITH UR;", CommandTimeout=#duration(0, 7, 0, 0)])
+in
+    Source

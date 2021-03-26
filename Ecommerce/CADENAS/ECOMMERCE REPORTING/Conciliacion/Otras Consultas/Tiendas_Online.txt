@@ -1,0 +1,8 @@
+// Tiendas_Online
+let
+    Source = DB2.Database("ieecdb2v1:50000", "inditex", [HierarchicalNavigation=true, Implementation="IBM", Query="-- BERSHKA - TIENDAS ONLINE#(lf)SELECT#(lf)#(tab)e.NOMBRE,#(lf)#(tab)e.COD_ENTIDAD_ECOMMERCE_WCS#(lf)FROM MAESTROS.ENTIDAD_ECOMMERCE e#(lf)WHERE #(lf)#(tab)e.NOMBRE LIKE 'Bershka%'#(lf)#(tab)AND e.NOMBRE NOT LIKE '%AUX%' #(lf)#(tab)#(tab)AND e.NOMBRE NOT LIKE '%AssetStore%'#(lf)WITH UR;"]),
+    #"Renamed Columns" = Table.RenameColumns(Source,{{"COD_ENTIDAD_ECOMMERCE_WCS", "Código Tienda Online"}, {"NOMBRE", "Tienda Online"}}),
+    #"Columna condicional agregada" = Table.AddColumn(#"Renamed Columns", "Tipo Tienda Online", each if Text.Contains([Tienda Online], "BershkaX") then "Marketplace" else "No Marketplace"),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columna condicional agregada",{{"Tipo Tienda Online", type text}})
+in
+    #"Tipo cambiado"

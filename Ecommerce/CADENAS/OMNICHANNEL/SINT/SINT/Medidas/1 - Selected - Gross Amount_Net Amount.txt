@@ -1,0 +1,6 @@
+// 1 - Selected - Gross Amount / Net Amount
+let
+    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTSUXIvyi8uVnDMzS/NK1GK1YlWMgIK+qWWwIViAQ==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [ID = _t, Filter = _t]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"ID", Int64.Type}, {"Filter", type text}})
+in
+    #"Tipo cambiado"

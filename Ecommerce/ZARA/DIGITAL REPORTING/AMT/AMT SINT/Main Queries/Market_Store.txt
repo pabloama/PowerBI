@@ -1,0 +1,22 @@
+// Market_Store
+let
+    Source = Oracle.Database("EXAPRO_REP", [HierarchicalNavigation=true, Query="-- ORACLE EXADATA - DW ECOMMERCE - OMNICHANNEL - ZARA - SINT VERSION DRIVE - MARKET, STORE AND BRAND#(lf)SELECT DISTINCT #(lf)#(tab)dp.PAIS country,#(lf)    dp.PAIS_ISO ISO,#(lf)#(tab)dp.DESCRIPCION market,#(lf)#(tab)dp.DESCRIPCION_INGLES market_english,#(lf)#(tab)dl.DESCRIPCION physical_store,#(lf)        dl.DESCRIPCION_DB2 descripcion_db2,#(lf)#(tab)dl.LOCALIZACION,#(lf)#(tab)CASE#(lf)#(tab)#(tab)WHEN dl.ID_CADENA IN (1, 2) THEN 'ZARA'#(lf)#(tab)#(tab)ELSE 'KIDDY''S CLASS'#(lf)#(tab)END AS brand#(lf)FROM DMCOMERCIAL.MIC_FACT_PEDIDO_DEVOL_ECOMM mf#(lf)INNER JOIN DMCOMERCIAL.DIM_PAIS dp#(lf)#(tab)ON (dp.ID_PAIS = mf.ID_PAIS)#(lf)INNER JOIN DMCOMERCIAL.DIM_LOCALIZACION dl#(lf)#(tab)ON (dl.ID_LOCALIZACION = mf.ID_LOCALIZACION_ALM_PICKING)#(lf)#(tab)#(tab)AND (dl.ID_TIPO_LOC IN (12, 13, 15, 16, 17, 18, 19, 20, 21, 81, 121)) -- SINT TRANSACTION#(lf)WHERE #(lf)#(tab)mf.ID_CADENA IN (1, 2) -- ZARA Y ZARA SUR (CON KIDDY'S CLASS INCLUIDAS EN ZARA)#(lf)#(tab)AND mf.ID_TIPO_MOVIMIENTO IN (72, 772) -- ORDER TRANSACTION#(lf)#(tab)AND mf.ESTADO NOT IN ('X', 'M') -- DRIVE #(lf)#(tab)AND mf.REPOSICION = 0 -- DRIVE#(lf)        AND mf.ES_CAMBIO = 0 -- EVITAR CARGAR CAMBIOS COMO SINT#(lf)#(tab)AND mf.ID_SECCION > 0 -- DRIVE#(lf)#(tab)AND mf.ID_PAIS > 0 -- DRIVE#(lf)        AND dl.LOCALIZACION > 0 -- QUITAMOS LOS ""NO TIENE""#(lf)ORDER BY #(lf)#(tab)dl.LOCALIZACION ASC"]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"MARKET", type text}, {"LOCALIZACION", type text}, {"COUNTRY", Int64.Type}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Changed Type",",","",Replacer.ReplaceText,{"MARKET", "MARKET_ENGLISH"}),
+    #"Added Custom" = Table.AddColumn(#"Replaced Value", "Store Description", each if [PHYSICAL_STORE] = "NO TIENE" then "NO TIENE" else  Text.PadStart(Text.BeforeDelimiter([PHYSICAL_STORE], " -"), 5, "0") & " - " & Text.AfterDelimiter([PHYSICAL_STORE], "- ")),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Store Description", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"PHYSICAL_STORE"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"MARKET", "Market"}, {"COUNTRY", "Country"}, {"MARKET_ENGLISH", "Market English"}, {"LOCALIZACION", "Location"}, {"BRAND", "Brand"}, {"DESCRIPCION_DB2", "Store Description Logistics"}}),
+    #"Added Custom1" = Table.AddColumn(#"Renamed Columns", "Market - Store", each [Market English] & " - " & [Store Description], type text),
+    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "ID Store", each if [Location] = "0" then "DOES NOT HAVE" else Text.PadStart([Location],5,"0"), type text),
+    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom2",{"Location"}),
+    #"Columna combinada insertada" = Table.AddColumn(#"Removed Columns1", "ID Country-Store", each Text.Combine({Text.From([Country], "es-ES"), "-", [ID Store]}), type text),
+    #"Merged Queries Pack Store" = Table.NestedJoin(#"Columna combinada insertada", {"ID Store"}, Packing_Stores, {"ID Store"}, "Packing_Stores", JoinKind.LeftOuter),
+    #"Expanded Pack Store" = Table.ExpandTableColumn(#"Merged Queries Pack Store", "Packing_Stores", {"Pack Store"}, {"Pack Store"}),
+    #"Replaced Value Pack Store null" = Table.ReplaceValue(#"Expanded Pack Store", null,"NO PACK STORES",Replacer.ReplaceValue,{"Pack Store"}),
+    #"Merged Queries" = Table.NestedJoin(#"Replaced Value Pack Store null", {"ID Store"}, AMT, {"STORE"}, "AMT", JoinKind.LeftOuter),
+    #"Expanded AMT" = Table.ExpandTableColumn(#"Merged Queries", "AMT", {"AMT"}, {"AMT"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Expanded AMT",{"ID Country-Store", "Country", "Market", "Market English", "ID Store", "Store Description", "Store Description Logistics", "Market - Store", "Brand", "Pack Store"}),
+    #"Filtered Rows" = Table.SelectRows(#"Reordered Columns", each ([#"Market - Store"] <> "FRANCE - 00160 - BCN-P. GRACIA" and [#"Market - Store"] <> "GERMANY - 06479 - MAD-SERRANO" and [#"Market - Store"] <> "FINLAND - 06659 - S.SEB-N.MERCADO"))
+in
+    #"Filtered Rows"

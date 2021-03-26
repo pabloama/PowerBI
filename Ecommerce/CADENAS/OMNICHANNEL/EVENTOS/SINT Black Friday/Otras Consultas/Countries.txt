@@ -1,0 +1,8 @@
+// Countries
+let
+    Source = Oracle.Database("EXAPRO_REP", [HierarchicalNavigation=true, Query="-- ORACLE EXADATA - DW ECOMMERCE - OMNICHANNEL - SINT - MARKET#(lf)SELECT #(lf)#(tab)dp.PAIS,#(lf)#(tab)dp.DESCRIPCION,#(lf)#(tab)dp.DESCRIPCION_INGLES#(lf)FROM DMCOMERCIAL.DIM_PAIS dp#(lf)ORDER BY #(lf)#(tab)dp.PAIS ASC", CommandTimeout=#duration(0, 7, 0, 0)]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"PAIS", Int64.Type}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"PAIS", "Country"}, {"DESCRIPCION", "Description"}, {"DESCRIPCION_INGLES", "English Description"}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns",null,"GENERIC",Replacer.ReplaceValue,{"English Description"})
+in
+    #"Replaced Value"

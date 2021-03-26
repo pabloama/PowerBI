@@ -1,0 +1,6 @@
+// 2 - Selected - EUR / ML
+let
+    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTSUXINDVLQeNS0RlMpVidayQgo4pOfnJij4FxaVJSal1ypFBsLAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [ID = _t, Filter = _t]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"ID", Int64.Type}, {"Filter", type text}})
+in
+    #"Tipo cambiado"

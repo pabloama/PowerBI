@@ -1,0 +1,27 @@
+// Stock_Insuficiente_INDOM
+let
+    Source = Table.Combine({Stock_Insuficiente_INDOM_1}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"COD_PEDIDO_WCS", type text}, {"CANTIDAD_SOLICITADA", Int64.Type}, {"CANTIDAD_SEPARADA", Int64.Type}, {"RESOLUCION_AUTOMATICA", Int64.Type}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"COD_PEDIDO_WCS", "Pedido"}, {"TIENDA_ONLINE", "Tienda Online"}, {"FECHA_PEDIDO", "Fecha Hora Pedido"}, {"FECHA_INSUFICIENTE", "Fecha Hora Stock Insuficiente"}, {"ORIGEN_STOCK", "Origen Stock"}, {"ID_SUBPEDIDO", "Subpedido"}, {"PARTNUMBER", "Partnumber"}, {"CANTIDAD_SOLICITADA", "Cantidad Solicitada"}, {"CANTIDAD_SEPARADA", "Cantidad Separada"}, {"RESOLUCION_AUTOMATICA", "Resolución"}, {"ESTADO_LINEA_PEDIDO", "Estado Línea Pedido"}, {"ESTADO_PEDIDO", "Estado Pedido"}}),
+    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Key Pedido Partnumber", each [Pedido] & "-" & [Partnumber]),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Key Pedido Partnumber", type text}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type1",{"Key Pedido Partnumber", "Pedido", "Subpedido", "Partnumber", "Fecha Hora Pedido", "Fecha Hora Stock Insuficiente", "Tienda Online", "Origen Stock", "Cantidad Solicitada", "Cantidad Separada", "Resolución"}),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Reordered Columns",{{"Resolución", type text}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Changed Type2","0","GIPI/COMPAS",Replacer.ReplaceText,{"Resolución"}),
+    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","1","INDOM",Replacer.ReplaceText,{"Resolución"}),
+    #"Inserted Date" = Table.AddColumn(#"Replaced Value1", "Date", each DateTime.Date([Fecha Hora Pedido]), type date),
+    #"Inserted Time" = Table.AddColumn(#"Inserted Date", "Time", each DateTime.Time([Fecha Hora Pedido]), type time),
+    #"Renamed Columns1" = Table.RenameColumns(#"Inserted Time",{{"Date", "Fecha Pedido"}, {"Time", "Hora Pedido"}}),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Renamed Columns1",{"Key Pedido Partnumber", "Pedido", "Subpedido", "Partnumber", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Tienda Online", "Origen Stock", "Cantidad Solicitada", "Cantidad Separada", "Resolución"}),
+    #"Inserted Date1" = Table.AddColumn(#"Reordered Columns1", "Date", each DateTime.Date([Fecha Hora Stock Insuficiente]), type date),
+    #"Inserted Time1" = Table.AddColumn(#"Inserted Date1", "Time", each DateTime.Time([Fecha Hora Stock Insuficiente]), type time),
+    #"Renamed Columns2" = Table.RenameColumns(#"Inserted Time1",{{"Date", "Fecha Stock Insuficiente"}, {"Time", "Hora Stock Insuficiente"}}),
+    #"Reordered Columns2" = Table.ReorderColumns(#"Renamed Columns2",{"Key Pedido Partnumber", "Pedido", "Subpedido", "Partnumber", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Stock Insuficiente", "Hora Stock Insuficiente", "Tienda Online", "Origen Stock", "Cantidad Solicitada", "Cantidad Separada", "Resolución"}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Reordered Columns2", "Fecha Hora Stock Insuficiente", "Fecha Hora Stock Insuficiente - Copy"),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Duplicated Column",{{"Fecha Hora Stock Insuficiente - Copy", type text}}),
+    #"Renamed Columns3" = Table.RenameColumns(#"Changed Type3",{{"Fecha Hora Stock Insuficiente - Copy", "Fecha Hora Stock Insuficiente - Texto"}}),
+    #"Added Conditional Column" = Table.AddColumn(#"Renamed Columns3", "Tipo Origen Stock", each if Text.Contains([Origen Stock], "-PST-") then "Tienda Física" else if not Text.Contains([Origen Stock], "-PST-") then "Almacén" else "DESCONOCIDO"),
+    #"Changed Type4" = Table.TransformColumnTypes(#"Added Conditional Column",{{"Tipo Origen Stock", type text}}),
+    #"Reordered Columns3" = Table.ReorderColumns(#"Changed Type4",{"Key Pedido Partnumber", "Pedido", "Subpedido", "Partnumber", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Stock Insuficiente", "Hora Stock Insuficiente", "Estado Pedido", "Estado Línea Pedido", "Tienda Online", "Tipo Origen Stock", "Origen Stock", "Cantidad Solicitada", "Cantidad Separada", "Resolución", "Fecha Hora Stock Insuficiente - Texto"})
+in
+    #"Reordered Columns3"

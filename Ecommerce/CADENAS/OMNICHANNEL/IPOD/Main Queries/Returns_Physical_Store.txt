@@ -1,0 +1,12 @@
+// Bershka_Returns_Physical_Store
+let
+    Source = Table.Combine({Bershka_Returns_Physical_Store_FY2020, Bershka_Returns_Physical_Store_FY2021}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"ID_FECHA", type date}, {"LOCALIZACION", type text}, {"PAIS", type text}}),
+    #"Add Column" = Table.AddColumn(#"Changed Type", "ID Store", each Text.PadStart([LOCALIZACION], 5, "0"), type text),
+    #"Add Column2" = Table.AddColumn(#"Add Column", "Store Description", each Text.PadStart(Text.BeforeDelimiter([PHYSICAL_STORE], " -"), 5, "0") & " - " & Text.AfterDelimiter([PHYSICAL_STORE], "- ")),
+    #"Inserted Merged Column" = Table.AddColumn(#"Add Column2", "ID Market-Store", each Text.Combine({[PAIS], [ID Store]}, "-"), type text),
+    #"Removed Columns" = Table.RemoveColumns(#"Inserted Merged Column",{"LOCALIZACION", "PHYSICAL_STORE"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"ID_FECHA", "Date"}, {"UNIDADES", "Units"}, {"LOCAL_AMOUNT", "Local Amount"}, {"AMOUNT_EUROS", "Amount (€)"}, {"MARKET", "Market"}, {"MARKET_ENGLISH", "Market English"}, {"PAIS_ISO", "Market ISO"}, {"PAIS", "ID Market"}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Date", "ID Market-Store", "Market ISO", "Market", "Market English", "ID Store", "Store Description", "Units", "Local Amount", "Amount (€)"})
+in
+    #"Reordered Columns"

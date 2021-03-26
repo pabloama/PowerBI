@@ -1,0 +1,5 @@
+// Stock_Insuficiente_Pedidos_Totales_1
+let
+    Source = DB2.Database("ieecdb2v1:50000", "inditex", [HierarchicalNavigation=true, Implementation="IBM", Query="-- IBM DB2 - 2ª RÉPLICA - STOCK INSUFICIENTE - BERSHKA - PARTE 1#(lf)SELECT #(lf)#(tab)COUNT (DISTINCT o.ORDERS_ID) num_pedidos,#(lf)#(tab)DATE(o.TIMEPLACED) fecha_pedido,#(lf)#(tab)s.DIRECTORY tienda_virtual#(lf)FROM UECOITX_SP2.ORDERS o#(lf)#(tab)INNER JOIN UECOITX_SP2.STORE s#(lf)#(tab)#(tab)ON (o.STOREENT_ID = s.STORE_ID)#(lf)WHERE #(lf)#(tab)s.DIRECTORY LIKE ('%Bershka%') #(lf)        AND s.DIRECTORY <> 'BershkaAUX'#(lf)#(tab)AND o.TIMEPLACED >= CURRENT TIMESTAMP - 15 DAYS#(lf)        AND o.STATUS NOT IN ('X')#(lf)GROUP BY#(lf)#(tab)DATE(o.TIMEPLACED),#(lf)#(tab)s.DIRECTORY#(lf)ORDER BY#(lf)#(tab)DATE(o.TIMEPLACED) ASC#(lf)WITH UR;"])
+in
+    Source

@@ -1,0 +1,11 @@
+// Encuestas_25009555
+let
+    Origen = Json.Document(Web.Contents("http://ieec1cappsc1.central.inditex.grp:9081/private/itxrestservux/1/store/25009555/survey/encuestaSatisfaccion?from=2019-02-01%2000%3A00%3A00&to=2023-01-31%2000%3A00%3A00&withKeyComponent=true")),
+    answeredSurveys = Origen[answeredSurveys],
+    #"Convertida en tabla" = Table.FromList(answeredSurveys, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Se expandió Column1" = Table.ExpandRecordColumn(#"Convertida en tabla", "Column1", {"comentario", "estado", "orderId", "plazo", "prendaYTalla"}, {"comentario", "estado", "orderId", "plazo", "prendaYTalla"}),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Se expandió Column1",{{"comentario", type text}, {"estado", Int64.Type}, {"orderId", type text}, {"plazo", Int64.Type}, {"prendaYTalla", Int64.Type}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"comentario", "Comentario"}, {"estado", "Estado"}, {"orderId", "Pedido"}, {"plazo", "Plazo"}, {"prendaYTalla", "Prenda y Talla"}}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas con nombre cambiado",{"Pedido", "Estado", "Plazo", "Prenda y Talla", "Comentario"})
+in
+    #"Columnas reordenadas"

@@ -1,0 +1,11 @@
+// Pedidos reales
+let
+    Source = Odbc.DataSource("dsn=Conexión Forecast", [HierarchicalNavigation=true]),
+    SPARK_Database = Source{[Name="SPARK",Kind="Database"]}[Data],
+    tmp_Schema = SPARK_Database{[Name="tmp",Kind="Schema"]}[Data],
+    pedidos_pull_Table = tmp_Schema{[Name="pedidos_pull",Kind="Table"]}[Data],
+    #"Renamed Columns" = Table.RenameColumns(pedidos_pull_Table,{{"id_localizacion_almacen", "Código CD"}, {"descripcion_cd", "Centro de distribución"}, {"pais", "País"}, {"fecha", "Fecha"}, {"pedidos", "Pedidos real"}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Código CD", type text}, {"id_pais", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "Clave", each [Código CD]&[País])
+in
+    #"Added Custom"

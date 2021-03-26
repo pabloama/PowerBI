@@ -1,0 +1,18 @@
+// Bershka_Location_Configuracion_store
+let
+    Source = DB2.Database("axindb2tndg6v1:50000", "inditex", [HierarchicalNavigation=true, Implementation="IBM", Query="SELECT#(lf)    cel.ID_CAMBIO_ESTADO_LOCALIZACION,#(lf)    cel.ID_ESTADO_LOCALIZACION,#(lf)        el.NOMBRE AS STATUS_TIENDA,#(lf)    cel.ID_LOCALIZACION,#(lf)    l.DESCRIPCION AS LOCALIZACION,#(lf)    cel.FECHA_HORA_NOTIFICACION,#(lf)    l.ID_PAIS,#(lf)    gd.ID_CADENA#(lf)FROM ECLOG_CADENAS_TND.CAMBIO_ESTADO_LOCALIZACION cel#(lf)        INNER JOIN ECLOG_CADENAS_TND.ESTADO_LOCALIZACION el#(lf)                ON cel.ID_ESTADO_LOCALIZACION = el.ID_ESTADO_LOCALIZACION#(lf)    INNER JOIN MAESTROS.LOCALIZACION l#(lf)        ON cel.ID_LOCALIZACION = l.ID_LOCALIZACION#(lf)    INNER JOIN ECLOG_CADENAS_TND.LOCALIZACION_GRUPO_DISTRIBUCION lgd#(lf)        ON l.ID_LOCALIZACION = lgd.ID_LOCALIZACION#(lf)    INNER JOIN ECLOG_CADENAS_TND.GRUPO_DISTRIBUCION gd#(lf)        ON gd.ID_GRUPO_DISTRIBUCION = lgd.ID_GRUPO_DISTRIBUCION#(lf)WHERE#(lf)   gd.ID_CADENA = 4 --Bershka", CommandTimeout=#duration(0, 7, 0, 0)]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Source,{{"ID_LOCALIZACION", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Tipo cambiado", "Store Location", each Text.PadStart([ID_LOCALIZACION], 5, "0"), type text),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Store Description", each [Store Location] & " - " & [LOCALIZACION], type text),
+    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "ID Country-Store", each Text.Combine({Text.From([ID_PAIS], "es-ES"), "-", [Store Location]}), type text),
+    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Added Custom2",{"ID_PAIS", type text}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Tipo cambiado1", "FECHA_HORA_NOTIFICACION", "FECHA_HORA_NOTIFICACION - Copia"),
+    #"Filas ordenadas" = Table.Sort(#"Columna duplicada",{{"Store Description", Order.Ascending}, {"FECHA_HORA_NOTIFICACION - Copia", Order.Descending}}),
+    #"Índice agregado" = Table.AddIndexColumn(#"Filas ordenadas", "Índice", 0, 1),
+    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Índice agregado",{{"FECHA_HORA_NOTIFICACION", type date}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado2",{{"FECHA_HORA_NOTIFICACION", "Fecha"}, {"FECHA_HORA_NOTIFICACION - Copia", "Fecha Hora"}, {"STATUS_TIENDA", "Status Tienda"}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado","STANDBY_PARTIAL","STANDBY PARTIAL",Replacer.ReplaceText,{"Status Tienda"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","STANDBY_TOTAL","STANDBY TOTAL",Replacer.ReplaceText,{"Status Tienda"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","DISABLED_CONTINGENCY","DISABLED CONTINGENCY",Replacer.ReplaceText,{"Status Tienda"})
+in
+    #"Valor reemplazado2"

@@ -1,0 +1,7 @@
+// Fechas_Rebajas
+let
+    Source = Oracle.Database("EXAPRO_REP", [Query="SELECT#(lf)  p.PAIS,#(lf)  c.ID_FECHA_INICIO#(lf)FROM#(lf)  DMCOMERCIAL.DIM_LOCALIZACION_FECHA_CMPPER c#(lf)INNER JOIN DMCOMERCIAL.DIM_LOCALIZACION l#(lf)  ON l.ID_LOCALIZACION = c.ID_LOCALIZACION#(lf)INNER JOIN DMCOMERCIAL.DIM_PAIS p#(lf)  ON p.ID_PAIS = c.ID_PAIS#(lf)WHERE#(lf)  c.ID_CAMPANA = 35#(lf)  AND c.ID_CADENA = 5 -- BERSHKA#(lf)  AND l.ID_TIPO_TIENDA = 3", HierarchicalNavigation=true]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"ID_FECHA_INICIO", type date}}),
+    #"Removed Duplicates" = Table.Distinct(#"Changed Type")
+in
+    #"Removed Duplicates"

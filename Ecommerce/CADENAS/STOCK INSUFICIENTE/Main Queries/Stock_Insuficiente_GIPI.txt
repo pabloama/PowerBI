@@ -1,0 +1,31 @@
+// Stock_Insuficiente_GIPI
+let
+    Source = Table.Combine({Stock_Insuficiente_GIPI_1, Stock_Insuficiente_GIPI_2}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"COD_PEDIDO_WCS", type text}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"COD_PEDIDO_WCS", "Pedido"}, {"TIENDA_VIRTUAL", "Tienda Virtual"}, {"FECHA_PEDIDO", "Fecha Hora Pedido"}, {"COMENTARIO", "Comentario"}, {"FECHA_INSUFICIENTE", "Fecha Hora Stock Insuficiente"}, {"FECHA_RESOLUCION_INSUFICIENTE", "Fecha Hora Resolución Stock Insuficiente"}, {"DESCRIPCION", "Estado Pedido"}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Pedido", "Tienda Virtual", "Fecha Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Hora Resolución Stock Insuficiente", "Comentario"}),
+    #"Added Custom" = Table.AddColumn(#"Reordered Columns", "Subpedido Calculado", each if Text.Contains([Comentario], "eliminado del subpedido") then Text.Trim(Text.BetweenDelimiters([Comentario], "subpedido ", " por")) 
+else if Text.Contains([Comentario], "Se ha eliminado de forma automática") then Text.Trim(Text.AfterDelimiter([Comentario], "subpedido "))
+else null),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Subpedido Calculado", type text}}),
+    #"Added Custom1" = Table.AddColumn(#"Changed Type1", "Partnumber Calculado", each if Text.Contains([Comentario], "Articulo") then Text.Trim(Text.BetweenDelimiters([Comentario], "Articulo ", "-")) 
+else if Text.Contains([Comentario], "artículo") then Text.Trim(Text.BetweenDelimiters([Comentario], "artículo ", "-"))
+else null),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom1",{{"Partnumber Calculado", type text}}),
+    #"Added Custom2" = Table.AddColumn(#"Changed Type2", "Key Pedido Partnumber", each if [Partnumber Calculado] = null then [Pedido] else [Pedido] & "-" & [Partnumber Calculado]),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom2",{{"Key Pedido Partnumber", type text}}),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Changed Type3",{"Key Pedido Partnumber", "Pedido", "Subpedido Calculado", "Partnumber Calculado", "Estado Pedido", "Tienda Virtual", "Fecha Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Hora Resolución Stock Insuficiente", "Comentario"}),
+    #"Inserted Date" = Table.AddColumn(#"Reordered Columns1", "Date", each DateTime.Date([Fecha Hora Pedido]), type date),
+    #"Inserted Time" = Table.AddColumn(#"Inserted Date", "Time", each DateTime.Time([Fecha Hora Pedido]), type time),
+    #"Renamed Columns1" = Table.RenameColumns(#"Inserted Time",{{"Date", "Fecha Pedido"}, {"Time", "Hora Pedido"}}),
+    #"Reordered Columns2" = Table.ReorderColumns(#"Renamed Columns1",{"Key Pedido Partnumber", "Pedido", "Subpedido Calculado", "Partnumber Calculado", "Tienda Virtual", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Hora Resolución Stock Insuficiente", "Comentario"}),
+    #"Inserted Date1" = Table.AddColumn(#"Reordered Columns2", "Date", each DateTime.Date([Fecha Hora Stock Insuficiente]), type date),
+    #"Inserted Time1" = Table.AddColumn(#"Inserted Date1", "Time", each DateTime.Time([Fecha Hora Stock Insuficiente]), type time),
+    #"Renamed Columns2" = Table.RenameColumns(#"Inserted Time1",{{"Date", "Fecha Stock Insuficiente"}, {"Time", "Hora Stock Insuficiente"}}),
+    #"Reordered Columns3" = Table.ReorderColumns(#"Renamed Columns2",{"Key Pedido Partnumber", "Pedido", "Subpedido Calculado", "Partnumber Calculado", "Tienda Virtual", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Stock Insuficiente", "Hora Stock Insuficiente", "Fecha Hora Resolución Stock Insuficiente", "Comentario"}),
+    #"Inserted Date2" = Table.AddColumn(#"Reordered Columns3", "Date", each DateTime.Date([Fecha Hora Resolución Stock Insuficiente]), type date),
+    #"Inserted Time2" = Table.AddColumn(#"Inserted Date2", "Time", each DateTime.Time([Fecha Hora Resolución Stock Insuficiente]), type time),
+    #"Renamed Columns3" = Table.RenameColumns(#"Inserted Time2",{{"Date", "Fecha Resolución Stock Insuficiente"}, {"Time", "Hora Resolución Stock Insuficiente"}}),
+    #"Reordered Columns4" = Table.ReorderColumns(#"Renamed Columns3",{"Key Pedido Partnumber", "Pedido", "Subpedido Calculado", "Partnumber Calculado", "Tienda Virtual", "Fecha Hora Pedido", "Fecha Pedido", "Hora Pedido", "Fecha Hora Stock Insuficiente", "Fecha Stock Insuficiente", "Hora Stock Insuficiente", "Fecha Hora Resolución Stock Insuficiente", "Fecha Resolución Stock Insuficiente", "Hora Resolución Stock Insuficiente", "Comentario"})
+in
+    #"Reordered Columns4"

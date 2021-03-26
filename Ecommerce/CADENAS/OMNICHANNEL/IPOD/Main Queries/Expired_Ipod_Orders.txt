@@ -1,0 +1,15 @@
+// Expired_Ipod_Orders
+let
+    Source = Table.Combine({Expired_Ipod_Orders_FY2021FQ1FQ2, Expired_Ipod_Orders_FY2021FQ3FQ4, Expired_Ipod_Orders_FY2020FQ1FQ2, Expired_Ipod_Orders_FY2020FQ3FQ4}),
+    #"Extracted Date" = Table.TransformColumns(Source,{{"TIMEPLACED", DateTime.Date, type date}}),
+    #"Added Custom" = Table.AddColumn(#"Extracted Date", "Cod Store", each Text.PadStart([ORIGEN], 5, "0")),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Cod Store", type text}}),
+    #"Merged Queries" = Table.NestedJoin(#"Changed Type1",{"Cod Store"},Market_Store,{"Cod Store"},"Market_Store",JoinKind.LeftOuter),
+    #"Expanded Market_Store" = Table.ExpandTableColumn(#"Merged Queries", "Market_Store", {"Store"}, {"Store"}),
+    #"Duplicados quitados" = Table.Distinct(#"Expanded Market_Store"),
+    #"Changed Type" = Table.TransformColumnTypes(#"Duplicados quitados",{{"Store", type text}, {"Cod Store", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"ORIGEN"}),
+    #"Extracted Text After Delimiter" = Table.TransformColumns(#"Removed Columns", {{"MARKETPLACE", each Text.AfterDelimiter(_, "ZARA_"), type text}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Extracted Text After Delimiter",{{"EXPIRED_IPOD_ORDERS", "Expired Ipod Orders"}, {"TIMEPLACED", "Timeplaced"}, {"NOMBRE_TIENDA", "Store Name"},  {"MARKETPLACE", "Country ISO"}})
+in
+    #"Renamed Columns"

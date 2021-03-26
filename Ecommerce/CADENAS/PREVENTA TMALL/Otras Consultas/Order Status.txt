@@ -1,0 +1,7 @@
+// Order Status
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("XZBBCsIwEEWvErJS6CWkVhEValEQShdpOmognZQYXfQ2Ll17hF7MdGIRspz5j5c/KUu+5AnP8KlEY3iVlDyjmTk7vFrlgM38AI2SavjgnIhVTKSmtoaJhzNW9d4TsHXAhG6FHN5Iuy3tnIWrx3zEpFaADijcxd4NStN2GtzPuI+BRWdNLXB6MT94IAdsyMkaYNLgRVlfYGxPTPF34F05M95HxwfF0ccFyJvop/84xU4I/Sk8+zAVKEETXn0B", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Estado = _t, Descripción = _t]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Estado", type text}, {"Descripción", type text}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Changed Type",{{"Estado", "Order Status"}, {"Descripción", "Order Description"}})
+in
+    #"Columnas con nombre cambiado"

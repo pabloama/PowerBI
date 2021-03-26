@@ -1,0 +1,8 @@
+// Refresco
+let
+    Source = DateTime.Time(DateTime.LocalNow()) & DateTime.Date(DateTime.LocalNow()),
+    #"Converted to Table" = #table(1, {{Source}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table",{{"Column1", type datetime}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Column1", "Last Refresh Date"}})
+in
+    #"Renamed Columns"

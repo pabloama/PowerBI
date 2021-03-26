@@ -1,0 +1,8 @@
+// Zara_Orders_Market_MICRO
+let
+    Source = Table.Combine({Zara_Orders_Market_SINT_LASTMONTH, Zara_Orders_Market_PAT_LASTMONTH}),
+    #"Renamed Columns" = Table.RenameColumns(Source,{{"ID_FECHA", "Date"}, {"PEDIDOS", "Orders"}, {"UNIDADES", "Units"}, {"AMOUNT_EUROS", "Amount (€)"}, {"MARKET_ENGLISH", "Market English"},  {"LOCAL_AMOUNT", "Local Amount"}, {"PAIS", "ID Country"}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns",",","",Replacer.ReplaceText,{"Market English"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Replaced Value",{"Date", "ID Country", "Market English", "Operation Type", "Orders", "Units", "Amount (€)", "Local Amount"})
+in
+    #"Reordered Columns"

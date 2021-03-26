@@ -1,0 +1,7 @@
+// 8 - Calculations - CRONOS (OLD)
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Columna1 = _t]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Columna1", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Columna1"})
+in
+    #"Removed Columns"

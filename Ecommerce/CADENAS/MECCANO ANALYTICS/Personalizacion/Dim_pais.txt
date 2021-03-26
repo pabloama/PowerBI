@@ -1,0 +1,5 @@
+// Dim_pais
+let
+    Origen = Odbc.Query("dsn=databricks meccano", "select id_pais, descript_dim_pais as Pais from dim_pais")
+in
+    Origen

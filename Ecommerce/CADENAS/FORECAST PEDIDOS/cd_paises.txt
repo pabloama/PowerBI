@@ -1,0 +1,11 @@
+// cd_paises
+let
+    Source = Odbc.DataSource("dsn=Conexión Forecast", [HierarchicalNavigation=true]),
+    SPARK_Database = Source{[Name="SPARK",Kind="Database"]}[Data],
+    tmp_Schema = SPARK_Database{[Name="tmp",Kind="Schema"]}[Data],
+    cd_paises_Table = tmp_Schema{[Name="cd_paises",Kind="Table"]}[Data],
+    #"Renamed Columns" = Table.RenameColumns(cd_paises_Table,{{"cd", "Código CD"}, {"descripcion_cd", "Centro distribución"}, {"pais", "Mercado"}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Código CD", type text}, {"id_pais", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "Clave", each [Código CD]&[Mercado])
+in
+    #"Added Custom"

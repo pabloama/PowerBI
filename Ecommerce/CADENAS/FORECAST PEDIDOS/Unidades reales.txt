@@ -1,0 +1,11 @@
+// Unidades reales
+let
+    Source = Odbc.DataSource("dsn=Conexión Forecast", [HierarchicalNavigation=true]),
+    SPARK_Database = Source{[Name="SPARK",Kind="Database"]}[Data],
+    tmp_Schema = SPARK_Database{[Name="tmp",Kind="Schema"]}[Data],
+    unidades_pull_Table = tmp_Schema{[Name="unidades_pull",Kind="Table"]}[Data],
+    #"Renamed Columns" = Table.RenameColumns(unidades_pull_Table,{{"id_localizacion_almacen", "Código CD"}, {"descripcion_cd", "Centro distribución"}, {"pais", "País"}, {"fecha", "Fecha"}, {"unidades", "Unidades real"}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Código CD", type text}, {"id_pais", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "Clave", each [Código CD]&[País])
+in
+    #"Added Custom"

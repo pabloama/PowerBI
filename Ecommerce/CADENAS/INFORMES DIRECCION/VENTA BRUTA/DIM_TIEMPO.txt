@@ -1,0 +1,5 @@
+// DIM_TIEMPO
+let
+    Origen = Oracle.Database("axine1-scansrv.central.inditex.grp:11521/s_itxpro_mstrcorp", [HierarchicalNavigation=true, Query="SELECT ID_FECHA, DIA_SEMANA FROM DMCOMERCIAL.DIM_TIEMPO"])
+in
+    Origen

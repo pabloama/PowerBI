@@ -1,0 +1,50 @@
+// fact_recomendaciones
+let
+    Origen = Odbc.Query("dsn=databricks meccano", "
+select id_fecha,
+id_pais_store,
+flag_recomendacion_feedback,
+channel_recomendacion,
+count(distinct aaa.id_pedido_ecommerce)-1 pedidos, 
+sum(articulos) articulos,
+sum(importe) importe,
+sum(num_recom) num_recom,
+sum(num_visit) num_visit,
+sum(num_add_basket) num_add_basket,
+sum(num_purchase_24h) num_purchase_24h
+from (
+  select cast(id_fecha_recomendacion as date) id_fecha,
+  id_pais_store,
+  id_pedido_ecommerce,
+  flag_recomendacion_feedback,
+  channel_recomendacion,
+  count(flag_recomendacion_feedback) num_recom,
+  sum(flag_visita) num_visit,
+  sum(flag_agregado_carrito_color) num_add_basket,
+  sum(flag_comprado_color_24h) num_purchase_24h
+  from dbo_lf.stg_recomendaciones 
+  where id_tipo_recomendacion in (1,3) and error_code = 0  
+  group by cast(id_fecha_recomendacion as date), id_pais_store, id_pedido_ecommerce,flag_recomendacion_feedback, channel_recomendacion)aaa
+  
+    left join  (select id_pedido_ecommerce,
+            sum(unidades_reales) articulos, 
+           sum(importe_real * coalesce(bb.cambio_referencia,dd.cambio_referencia)) importe
+          from dbo_pb.ult_estado_linea_pedido_pb aa  
+          left join (select id_moneda, codigo_moneda,
+case when id_moneda in (71,18)  then cambio_referencia*0.001 else cambio_referencia end cambio_referencia
+from dbo_itx.stg_moneda ) bb  on aa.id_moneda = bb.id_moneda 
+          left join dim_pais cc on  (aa.id_pais = cc.id_pais)
+          left join (select id_moneda, codigo_moneda,
+case when id_moneda in (71,18)  then cambio_referencia*0.001 else cambio_referencia end cambio_referencia
+from dbo_itx.stg_moneda ) dd on (cc.codigo_moneda = dd.codigo_moneda)
+          group by id_pedido_ecommerce)b 
+on (aaa.id_pedido_ecommerce =b.id_pedido_ecommerce)
+
+group by id_fecha,
+id_pais_store,
+flag_recomendacion_feedback,
+channel_recomendacion
+"),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"channel_recomendacion", "Canal Recomendación"}})
+in
+    #"Columnas con nombre cambiado"

@@ -1,0 +1,5 @@
+// Refresco
+let
+    Origen = DateTime.Time(DateTime.LocalNow()) & DateTime.Date(DateTime.LocalNow())
+in
+    Origen

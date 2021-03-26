@@ -1,0 +1,6 @@
+// ImporteNetaA-1
+let
+    Origen = Oracle.Database("axine1-scansrv.central.inditex.grp:11521/s_itxpro_mstrcorp", [HierarchicalNavigation=true, Query="select#(tab)a11.ID_PAIS  ID_PAIS_NUM_6_0,#(lf)#(tab)a12.ID_FECHA  ID_FECHA,#(lf)#(tab)a11.ID_CADENA  ID_CADENA,#(lf)#(tab)sum((a11.IMPORTE * a11.CAMBIO_REFERENCIA))  WJXBFS1#(lf)from#(tab)DMCOMERCIAL.MIC_FACT_PEDIDO_DEVOL_ECOMM#(tab)a11#(lf)#(tab)join#(tab)DMCOMERCIAL.DIM_TIEMPO#(tab)a12#(lf)#(tab)  on #(tab)(a11.ID_FECHA = a12.FECHA_MISMO_DIA_COMERCIAL)#(lf)where#(tab)a12.ID_FECHA >= TO_DATE('2021-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS')#(lf) and a11.ID_ESTADO_PEDIDO_ECOMMERCE not in (2)#(lf) and a11.ID_CADENA in (5, 11, 7, 3, 6, 16, 14, 8)#(lf)group by#(tab)a11.ID_PAIS,#(lf)#(tab)a12.ID_FECHA,#(lf)#(tab)a11.ID_CADENA"]),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"WJXBFS1", "Importe€NetaA-1"}, {"ID_PAIS_NUM_6_0", "ID_PAIS"}})
+in
+    #"Columnas con nombre cambiado"

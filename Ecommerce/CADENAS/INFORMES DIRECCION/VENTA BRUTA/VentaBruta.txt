@@ -1,0 +1,22 @@
+// VentaBruta
+let
+    Origen = Table.Combine({#"Importe€Neta", #"Importe€NetaA-1", #"Importe€Bruta", #"Importe€BrutaA-1"}),
+    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Importe€Neta", "Importe€NetaA-1", "Importe€Bruta", "Importe€BrutaA-1"}),
+    #"Duplicados quitados" = Table.Distinct(#"Columnas quitadas"),
+    #"Consultas combinadas" = Table.NestedJoin(#"Duplicados quitados", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, #"Importe€Neta", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, "Importe€Neta", JoinKind.LeftOuter),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Consultas combinadas", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, #"Importe€NetaA-1", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, "Importe€NetaA-1", JoinKind.LeftOuter),
+    #"Consultas combinadas2" = Table.NestedJoin(#"Consultas combinadas1", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, #"Importe€Bruta", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, "Importe€Bruta", JoinKind.LeftOuter),
+    #"Consultas combinadas3" = Table.NestedJoin(#"Consultas combinadas2", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, #"Importe€BrutaA-1", {"ID_PAIS", "ID_FECHA", "ID_CADENA"}, "Importe€BrutaA-1", JoinKind.LeftOuter),
+    #"Consultas combinadas4" = Table.NestedJoin(#"Consultas combinadas3", {"ID_CADENA"}, DIM_CADENA, {"ID_CADENA"}, "DIM_CADENA", JoinKind.Inner),
+    #"Consultas combinadas5" = Table.NestedJoin(#"Consultas combinadas4", {"ID_FECHA"}, DIM_TIEMPO, {"ID_FECHA"}, "DIM_TIEMPO", JoinKind.Inner),
+    #"Consultas combinadas6" = Table.NestedJoin(#"Consultas combinadas5", {"ID_PAIS"}, DIM_PAIS, {"ID_PAIS"}, "DIM_PAIS", JoinKind.Inner),
+    #"Se expandió Importe€Neta" = Table.ExpandTableColumn(#"Consultas combinadas6", "Importe€Neta", {"Importe€Neta"}, {"Importe€Neta.Importe€Neta"}),
+    #"Se expandió Importe€NetaA-1" = Table.ExpandTableColumn(#"Se expandió Importe€Neta", "Importe€NetaA-1", {"Importe€NetaA-1"}, {"Importe€NetaA-1.Importe€NetaA-1"}),
+    #"Se expandió Importe€Bruta" = Table.ExpandTableColumn(#"Se expandió Importe€NetaA-1", "Importe€Bruta", {"Importe€Bruta"}, {"Importe€Bruta.Importe€Bruta"}),
+    #"Se expandió Importe€BrutaA-1" = Table.ExpandTableColumn(#"Se expandió Importe€Bruta", "Importe€BrutaA-1", {"Importe€BrutaA-1"}, {"Importe€BrutaA-1.Importe€BrutaA-1"}),
+    #"Se expandió DIM_CADENA" = Table.ExpandTableColumn(#"Se expandió Importe€BrutaA-1", "DIM_CADENA", {"CADENA"}, {"DIM_CADENA.CADENA"}),
+    #"Se expandió DIM_TIEMPO" = Table.ExpandTableColumn(#"Se expandió DIM_CADENA", "DIM_TIEMPO", {"DIA_SEMANA"}, {"DIM_TIEMPO.DIA_SEMANA"}),
+    #"Se expandió DIM_PAIS" = Table.ExpandTableColumn(#"Se expandió DIM_TIEMPO", "DIM_PAIS", {"MERCADO"}, {"DIM_PAIS.MERCADO"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió DIM_PAIS",{{"DIM_PAIS.MERCADO", "Mercado"}, {"Importe€Neta.Importe€Neta", "Importe € Neta"}, {"Importe€NetaA-1.Importe€NetaA-1", "Importe€ Neta A-1"}, {"Importe€Bruta.Importe€Bruta", "Importe € Bruta"}, {"Importe€BrutaA-1.Importe€BrutaA-1", "Importe € Bruta A-1"}})
+in
+    #"Columnas con nombre cambiado"

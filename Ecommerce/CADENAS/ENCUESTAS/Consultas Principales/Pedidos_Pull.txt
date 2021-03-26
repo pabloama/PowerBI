@@ -1,0 +1,10 @@
+// pedidos_pull
+let
+    Origen = Table.Combine({pedidos_pull_fy2020_1T,pedidos_pull_fy2020_2T,pedidos_pull_fy2020_3T,pedidos_pull_fy2020_4T,pedidos_pull_fy2021_1T,pedidos_pull_fy2021_2T,pedidos_pull_fy2021_3T,pedidos_pull_fy2021_4T}),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"ORDER_CODE", type text}}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Tipo cambiado", {"ORDER_CODE"}, Encuestas, {"Pedido"}, "Encuestas", JoinKind.LeftOuter),
+    #"Se expandió Encuestas" = Table.ExpandTableColumn(#"Consultas combinadas", "Encuestas", {"Estado", "Plazo", "Prenda y Talla", "Comentario"}, {"Encuestas.Estado", "Encuestas.Plazo", "Encuestas.Prenda y Talla", "Encuestas.Comentario"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió Encuestas",{{"Encuestas.Estado", "Estado"}, {"Encuestas.Plazo", "Plazo"}, {"Encuestas.Prenda y Talla", "Prenda y Talla"}, {"Encuestas.Comentario", "Comentario"}}),
+    #"Duplicados quitados" = Table.Distinct(#"Columnas con nombre cambiado", {"ORDER_CODE"})
+in
+    #"Duplicados quitados"

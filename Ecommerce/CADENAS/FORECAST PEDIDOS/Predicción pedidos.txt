@@ -1,0 +1,11 @@
+// Predicción pedidos
+let
+    Source = Odbc.DataSource("dsn=Conexión Forecast", [HierarchicalNavigation=true]),
+    SPARK_Database = Source{[Name="SPARK",Kind="Database"]}[Data],
+    default_Schema = SPARK_Database{[Name="default",Kind="Schema"]}[Data],
+    datos_forecast_pb_peds_Table = default_Schema{[Name="datos_forecast_pb_peds",Kind="Table"]}[Data],
+    #"Columnas con nombre cambiado" = Table.RenameColumns(datos_forecast_pb_peds_Table,{{"FECHA_CARGA", "Fecha carga"}, {"FECHA_PREDICHA", "Fecha predicha"}, {"CD", "Código CD"}, {"DESCRIPCION_CD", "Centro distribución"}, {"PAIS", "País"}, {"PREDICCION_PEDIDOS", "Predicción pedidos"}}),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"Fecha predicha", type date}, {"Código CD", type text}}),
+    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado", "Clave", each [Código CD]&[País])
+in
+    #"Personalizada agregada"

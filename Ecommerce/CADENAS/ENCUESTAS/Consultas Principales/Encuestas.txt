@@ -1,0 +1,6 @@
+// Encuestas
+let
+    Origen = Table.Combine({Encuestas_24009400, Encuestas_24009413,Encuestas_24009401,Encuestas_24009403,Encuestas_24009404,Encuestas_24009405,Encuestas_24009406,Encuestas_24009408,Encuestas_24009410,Encuestas_24009411,Encuestas_24009412,Encuestas_24009417,Encuestas_24009419,Encuestas_24009426,Encuestas_24009486,Encuestas_24009502,Encuestas_24009507,Encuestas_24009509,Encuestas_25009520,Encuestas_25009521,Encuestas_25009522,Encuestas_25009523,Encuestas_25009524,Encuestas_25009525,Encuestas_25009539,Encuestas_25009543,Encuestas_25009545,Encuestas_25009546,Encuestas_25009547,Encuestas_25009550,Encuestas_25009554,Encuestas_25009555,Encuestas_25009559}),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Estado", type text}, {"Plazo", type text}, {"Prenda y Talla", type text}})
+in
+    #"Tipo cambiado"

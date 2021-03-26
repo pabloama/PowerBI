@@ -1,0 +1,7 @@
+// fact_pedidos
+let
+    Origen = Odbc.Query("dsn=databricks meccano", "#(lf)select cast(fecha_pedido_local as date) id_fecha,aa.id_pais,#(lf)#(lf)count(distinct id_pedido_ecommerce) pedidos,#(lf)             #(lf)           sum(importe_real * coalesce(bb.cambio_referencia,dd.cambio_referencia)) importe#(lf)          from dbo_lf.ult_estado_linea_pedido_lf aa  #(lf)          left join (select id_moneda, codigo_moneda,
+case when id_moneda in (71,18)  then cambio_referencia*0.001 else cambio_referencia end cambio_referencia
+from dbo_itx.stg_moneda ) bb  on aa.id_moneda = bb.id_moneda #(lf)          left join dim_pais cc on  (aa.id_pais = cc.id_pais)#(lf)          left join dbo_itx.stg_moneda dd on (cc.codigo_moneda = dd.codigo_moneda)#(lf)          where fecha_cancelado is null and aa.id_pais in (select distinct id_pais_store from dbo_lf.stg_recomendaciones)#(lf)          group by cast(fecha_pedido_local as date),aa.id_pais#(lf)")
+in
+    Origen

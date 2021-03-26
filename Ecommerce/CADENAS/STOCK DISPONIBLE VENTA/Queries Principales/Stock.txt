@@ -1,0 +1,7 @@
+// Stock
+let
+    Source = Table.Combine({Store_Stock_Irlanda, Warehouse_Stock_Irlanda, Store_Stock_Marketplaces_Irlanda, Warehouse_Stock_Marketplaces_Irlanda, Store_Stock_China, Warehouse_Stock_China, Store_Stock_Marketplaces_China, Warehouse_Stock_Marketplaces_China}),
+    #"Valor reemplazado" = Table.ReplaceValue(Source,"Freeze Transfer","Picking Transfer",Replacer.ReplaceValue,{"Relación"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Virtual","Virtual (Marketplaces)",Replacer.ReplaceValue,{"Relación"})
+in
+    #"Valor reemplazado1"

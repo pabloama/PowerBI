@@ -1,0 +1,5 @@
+// DIM_CADENA
+let
+    Origen = Oracle.Database("axine1-scansrv.central.inditex.grp:11521/s_itxpro_mstrcorp", [HierarchicalNavigation=true, Query="SELECT ID_CADENA, CADENA FROM DMCOMERCIAL.DIM_CADENA"])
+in
+    Origen

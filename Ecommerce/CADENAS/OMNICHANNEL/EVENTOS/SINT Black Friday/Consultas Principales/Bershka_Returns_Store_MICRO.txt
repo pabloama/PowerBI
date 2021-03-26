@@ -1,0 +1,14 @@
+// Bershka_Returns_Store_MICRO
+let
+    Source = Table.Combine({Bershka_Returns_Store_MICRO_BF2019,Bershka_Returns_Store_MICRO_BF2020}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"ID_FECHA", type date}, {"DEVOLUCIONES", Int64.Type}, {"UNIDADES", Int64.Type}, {"LOCATION", type text}, {"PAIS", Int64.Type}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"ID_FECHA", "Date"}, {"DEVOLUCIONES", "Returns"}, {"UNIDADES", "Units"}, {"AMOUNT_EUROS", "Amount (€)"}, {"MARKET_ENGLISH", "Market English"},  {"LOCAL_AMOUNT", "Local Amount"}, {"LOCATION", "Location"}, {"PHYSICAL_STORE", "Physical Store"}, {"PAIS", "Country"}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns",",","",Replacer.ReplaceText,{"Market English"}),
+    #"Added Custom" = Table.AddColumn(#"Replaced Value", "Store Location", each Text.PadStart([Location], 5, "0"), type text),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Store Description", each [Store Location] & " - " & Text.AfterDelimiter([Physical Store], "- "), type text),
+    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "Market - Store", each [Market English] & " - " & [Store Description], type text),
+    #"Inserted Merged Column" = Table.AddColumn(#"Added Custom2", "ID Country-Store", each Text.Combine({Text.From([Country], "es-ES"), [Store Location]}, "-"), type text),
+    #"Removed Columns" = Table.RemoveColumns(#"Inserted Merged Column",{"Physical Store", "Location"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"Date", "ID Country-Store", "Market English", "Market - Store", "Store Location", "Store Description", "Returns", "Units", "Amount (€)", "Local Amount"})
+in
+    #"Reordered Columns"

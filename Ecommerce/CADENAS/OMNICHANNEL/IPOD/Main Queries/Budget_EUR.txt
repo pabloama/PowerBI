@@ -1,0 +1,5 @@
+// Budget_EUR
+let
+    Source = Table.Combine({Budget_EUR_FY2020})
+in
+    Source
