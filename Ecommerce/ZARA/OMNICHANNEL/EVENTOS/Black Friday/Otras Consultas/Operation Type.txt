@@ -1,0 +1,6 @@
+// Operation Type
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WCvb0C1GK1YEwtJViYwE=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Operation Type" = _t]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Operation Type", type text}})
+in
+    #"Changed Type"

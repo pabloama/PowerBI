@@ -1,0 +1,9 @@
+// Zara_PAT_PENDING
+let
+    Source = Table.Combine({Zara_PAT_PENDING_BF_LAST, Zara_PAT_PENDING_BF_CURRENT}),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"FECHA_COMPRA_LOCAL", type date}, {"ID_PAIS", type text}, {"COD_TIENDA", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "Store Location", each if [COD_TIENDA] = "0" then "DOES NOT HAVE" else Text.PadStart([COD_TIENDA],5,"0"), type text),
+    #"Removed Columns" = Table.RemoveColumns(#"Added Custom",{"COD_TIENDA"}),
+    Custom1 = Table.AddColumn(#"Removed Columns", "ID Country-Store", each Text.Combine({Text.From([ID_PAIS], "es-ES"), "-", [Store Location]}), type text)
+in
+    Custom1
